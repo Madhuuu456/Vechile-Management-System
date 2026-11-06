@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reports | Madhu Vehicle Service Management</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="header"></div>
+<main class="container">
+  <h1>📊 Reports</h1>
+  <p class="subtitle">A quick summary of your business.</p>
+  <div class="stats">
+    <div class="stat green"><div class="num" id="r-revenue">₹0</div><div class="lbl">Total revenue (paid)</div></div>
+    <div class="stat red"><div class="num" id="r-pending">₹0</div><div class="lbl">Pending payments</div></div>
+    <div class="stat"><div class="num" id="r-bookings">0</div><div class="lbl">Total bookings</div></div>
+  </div>
+  <div class="cols">
+    <section class="card"><h2>Bookings by status</h2><div id="by-status"></div></section>
+    <section class="card"><h2>Most booked services</h2><div id="top-services"></div></section>
+    <section class="card"><h2>Monthly revenue (last 6 months)</h2><div id="monthly"></div></section>
+  </div>
+</main>
+<div id="footer"></div>
+<script src="common.js"></script>
+<script>
+function bars(el, items, fmt) {
+  const box = document.getElementById(el);
+  if (!items.length) { box.innerHTML = '<p class="muted">No data yet.</p>'; return; }
+  const max = Math.max(...items.map((i) => i.value), 1);
+  box.innerHTML = items.map((i) => `<div class="bar-row"><div class="bar-label">${esc(i.label)}</div>
+    <div class="bar"><div style="width:${(i.value / max) * 100}%"></div></div>
+    <div class="bar-val">${fmt(i.value)}</div></div>`).join('');
+}
+(async () => {
+  try {
+    const s = await api('/api/stats');
+    document.getElementById('r-revenue').textContent = money(s.revenue);
+    document.getElementById('r-pending').textContent = money(s.pendingPayments);
+    document.getElementById('r-bookings').textContent = s.bookings;
+    bars('by-status', s.byStatus.map((x) => ({ label: x.status, value: Number(x.c) })), (v) => v);
+    bars('top-services', s.topServices.map((x) => ({ label: x.name, value: Number(x.c) })), (v) => v);
+    bars('monthly', s.monthly.map((x) => ({ label: x.m, value: Number(x.total) })), money);
+  } catch (err) { toast(err.message, 'error'); }
+})();
+</script>
+</body>
+</html>

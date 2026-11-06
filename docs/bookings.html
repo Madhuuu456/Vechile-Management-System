@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bookings | Madhu Vehicle Service Management</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="header"></div>
+<main class="container">
+  <h1>📅 Bookings</h1>
+  <p class="subtitle">Book a service for a vehicle and track its status.</p>
+  <section class="card">
+    <h2 id="form-title">Add New Booking</h2>
+    <form id="crud-form">
+      <div id="fields" class="grid"></div>
+      <div class="form-actions">
+        <button type="submit" class="btn primary" id="submit-btn">Save</button>
+        <button type="button" class="btn" id="cancel-btn">Clear</button>
+      </div>
+    </form>
+  </section>
+  <section class="card">
+    <div class="table-head">
+      <h2>All Bookings (<span id="count">0</span>)</h2>
+      <input type="search" id="search" placeholder="Search...">
+    </div>
+    <div class="table-wrap"><table><thead id="head"></thead><tbody id="rows"></tbody></table></div>
+  </section>
+</main>
+<div id="footer"></div>
+<script src="common.js"></script>
+<script>
+initCrud({
+  endpoint: '/api/bookings', single: 'Booking',
+  fields: [
+    { name: 'vehicle_id', label: 'Vehicle', type: 'select', required: true,
+      optionsFrom: { url: '/api/vehicles', label: (r) => `${r.reg_number} - ${r.make} ${r.model} (${r.customer_name})`, page: 'vehicles.html', pageName: 'Vehicles' } },
+    { name: 'service_id', label: 'Service', type: 'select', required: true,
+      optionsFrom: { url: '/api/services', label: (r) => `${r.name} - ₹${r.price}`, page: 'services.html', pageName: 'Services' } },
+    { name: 'service_date', label: 'Service Date', type: 'date', required: true, default: 'today' },
+    { name: 'status', label: 'Status', type: 'select', required: true, default: 'Pending', options: ['Pending', 'In Progress', 'Completed', 'Cancelled'] },
+    { name: 'notes', label: 'Notes', type: 'textarea' }
+  ],
+  columns: [
+    { key: 'id', label: 'ID' }, { key: 'reg_number', label: 'Vehicle' }, { key: 'customer_name', label: 'Customer' },
+    { key: 'service_name', label: 'Service' }, { key: 'service_date', label: 'Date' },
+    { label: 'Status', format: (r) => badge(r.status) }, { label: 'Price', format: (r) => money(r.price) }
+  ]
+});
+</script>
+</body>
+</html>

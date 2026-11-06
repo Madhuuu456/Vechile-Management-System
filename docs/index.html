@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Madhu | Vehicle Service Management System</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="header"></div>
+<main class="container">
+  <h1>Welcome to Madhu 🔧</h1>
+  <p class="subtitle">Vehicle Service Management System - dashboard</p>
+
+  <div class="stats">
+    <div class="stat"><div class="num" id="s-customers">0</div><div class="lbl">Customers</div></div>
+    <div class="stat"><div class="num" id="s-vehicles">0</div><div class="lbl">Vehicles</div></div>
+    <div class="stat"><div class="num" id="s-services">0</div><div class="lbl">Services offered</div></div>
+    <div class="stat orange"><div class="num" id="s-active">0</div><div class="lbl">Active bookings</div></div>
+    <div class="stat green"><div class="num" id="s-revenue">₹0</div><div class="lbl">Revenue (paid)</div></div>
+    <div class="stat red"><div class="num" id="s-pending">₹0</div><div class="lbl">Pending payments</div></div>
+  </div>
+
+  <h2>Quick links</h2>
+  <div class="links" style="margin-bottom:22px">
+    <a href="customers.html">👥 Customers<span>Add and manage customer data</span></a>
+    <a href="vehicles.html">🚗 Vehicles<span>Register customer vehicles</span></a>
+    <a href="services.html">🛠️ Services<span>Service list and prices</span></a>
+    <a href="bookings.html">📅 Bookings<span>Book and track services</span></a>
+    <a href="payments.html">💳 Payments<span>Record payments</span></a>
+    <a href="reports.html">📊 Reports<span>Revenue and service summary</span></a>
+  </div>
+
+  <section class="card">
+    <h2>Recent bookings</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Vehicle</th><th>Customer</th><th>Service</th><th>Date</th><th>Status</th></tr></thead>
+        <tbody id="recent"><tr><td colspan="6" class="empty">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+<div id="footer"></div>
+<script src="common.js"></script>
+<script>
+(async () => {
+  try {
+    const s = await api('/api/stats');
+    document.getElementById('s-customers').textContent = s.customers;
+    document.getElementById('s-vehicles').textContent = s.vehicles;
+    document.getElementById('s-services').textContent = s.services;
+    document.getElementById('s-active').textContent = s.activeBookings;
+    document.getElementById('s-revenue').textContent = money(s.revenue);
+    document.getElementById('s-pending').textContent = money(s.pendingPayments);
+    document.getElementById('recent').innerHTML = s.recent.length
+      ? s.recent.map((r) => `<tr><td>${r.id}</td><td>${esc(r.reg_number)}</td><td>${esc(r.customer_name)}</td>
+          <td>${esc(r.service_name)}</td><td>${esc(r.service_date)}</td><td>${badge(r.status)}</td></tr>`).join('')
+      : '<tr><td colspan="6" class="empty">No bookings yet. Add customers, vehicles and then a booking.</td></tr>';
+  } catch (err) { toast(err.message, 'error'); }
+})();
+</script>
+</body>
+</html>

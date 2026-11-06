@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payments | Madhu Vehicle Service Management</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="header"></div>
+<main class="container">
+  <h1>💳 Payments</h1>
+  <p class="subtitle">Record payments for bookings.</p>
+  <section class="card">
+    <h2 id="form-title">Add New Payment</h2>
+    <form id="crud-form">
+      <div id="fields" class="grid"></div>
+      <div class="form-actions">
+        <button type="submit" class="btn primary" id="submit-btn">Save</button>
+        <button type="button" class="btn" id="cancel-btn">Clear</button>
+      </div>
+    </form>
+  </section>
+  <section class="card">
+    <div class="table-head">
+      <h2>All Payments (<span id="count">0</span>)</h2>
+      <input type="search" id="search" placeholder="Search...">
+    </div>
+    <div class="table-wrap"><table><thead id="head"></thead><tbody id="rows"></tbody></table></div>
+  </section>
+</main>
+<div id="footer"></div>
+<script src="common.js"></script>
+<script>
+(async () => {
+  const { form } = await initCrud({
+    endpoint: '/api/payments', single: 'Payment',
+    fields: [
+      { name: 'booking_id', label: 'Booking', type: 'select', required: true,
+        optionsFrom: { url: '/api/bookings', label: (r) => `#${r.id} - ${r.reg_number} - ${r.service_name} (${r.customer_name})`, page: 'bookings.html', pageName: 'Bookings' } },
+      { name: 'amount', label: 'Amount (₹)', type: 'number', required: true, attrs: 'min="0" step="0.01"' },
+      { name: 'method', label: 'Payment Method', type: 'select', required: true, default: 'Cash', options: ['Cash', 'Card', 'UPI', 'Net Banking'] },
+      { name: 'pay_date', label: 'Payment Date', type: 'date', required: true, default: 'today' },
+      { name: 'status', label: 'Status', type: 'select', required: true, default: 'Paid', options: ['Paid', 'Pending'] }
+    ],
+    columns: [
+      { key: 'id', label: 'ID' }, { label: 'Booking', format: (r) => '#' + r.booking_id },
+      { key: 'reg_number', label: 'Vehicle' }, { key: 'customer_name', label: 'Customer' },
+      { key: 'service_name', label: 'Service' }, { label: 'Amount', format: (r) => money(r.amount) },
+      { key: 'method', label: 'Method' }, { key: 'pay_date', label: 'Date' },
+      { label: 'Status', format: (r) => badge(r.status) }
+    ]
+  });
+  // When a booking is chosen, fill the amount with the service price automatically
+  try {
+    const bookings = await api('/api/bookings');
+    form.elements.booking_id.addEventListener('change', (e) => {
+      const b = bookings.find((x) => String(x.id) === e.target.value);
+      if (b) form.elements.amount.value = b.price;
+    });
+  } catch (err) { toast(err.message, 'error'); }
+})();
+</script>
+</body>
+</html>
