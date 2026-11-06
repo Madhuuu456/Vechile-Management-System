@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vehicles | Madhu Vehicle Service Management</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="header"></div>
+<main class="container">
+  <h1>🚗 Vehicles</h1>
+  <p class="subtitle">Register vehicles and link each one to its owner (customer).</p>
+  <section class="card">
+    <h2 id="form-title">Add New Vehicle</h2>
+    <form id="crud-form">
+      <div id="fields" class="grid"></div>
+      <div class="form-actions">
+        <button type="submit" class="btn primary" id="submit-btn">Save</button>
+        <button type="button" class="btn" id="cancel-btn">Clear</button>
+      </div>
+    </form>
+  </section>
+  <section class="card">
+    <div class="table-head">
+      <h2>All Vehicles (<span id="count">0</span>)</h2>
+      <input type="search" id="search" placeholder="Search...">
+    </div>
+    <div class="table-wrap"><table><thead id="head"></thead><tbody id="rows"></tbody></table></div>
+  </section>
+</main>
+<div id="footer"></div>
+<script src="common.js"></script>
+<script>
+initCrud({
+  endpoint: '/api/vehicles', single: 'Vehicle',
+  fields: [
+    { name: 'customer_id', label: 'Owner (Customer)', type: 'select', required: true,
+      optionsFrom: { url: '/api/customers', label: (r) => `${r.name} (${r.phone})`, page: 'customers.html', pageName: 'Customers' } },
+    { name: 'reg_number', label: 'Registration Number', required: true, upper: true, placeholder: 'AP39AB1234' },
+    { name: 'make', label: 'Make / Brand', required: true, placeholder: 'e.g. Honda' },
+    { name: 'model', label: 'Model', required: true, placeholder: 'e.g. City' },
+    { name: 'year', label: 'Year', type: 'number', attrs: 'min="1950" max="2100"', placeholder: '2020' },
+    { name: 'type', label: 'Vehicle Type', type: 'select', required: true, options: ['Car', 'Bike', 'Scooter', 'Auto', 'Truck', 'Bus', 'Other'] }
+  ],
+  columns: [
+    { key: 'id', label: 'ID' }, { key: 'reg_number', label: 'Reg. No' }, { key: 'customer_name', label: 'Owner' },
+    { key: 'make', label: 'Make' }, { key: 'model', label: 'Model' }, { key: 'year', label: 'Year' }, { key: 'type', label: 'Type' }
+  ]
+});
+</script>
+</body>
+</html>

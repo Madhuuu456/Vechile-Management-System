@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Customers | Madhu Vehicle Service Management</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="header"></div>
+<main class="container">
+  <h1>👥 Customers</h1>
+  <p class="subtitle">Add, edit and search your customers.</p>
+  <section class="card">
+    <h2 id="form-title">Add New Customer</h2>
+    <form id="crud-form">
+      <div id="fields" class="grid"></div>
+      <div class="form-actions">
+        <button type="submit" class="btn primary" id="submit-btn">Save</button>
+        <button type="button" class="btn" id="cancel-btn">Clear</button>
+      </div>
+    </form>
+  </section>
+  <section class="card">
+    <div class="table-head">
+      <h2>All Customers (<span id="count">0</span>)</h2>
+      <input type="search" id="search" placeholder="Search...">
+    </div>
+    <div class="table-wrap"><table><thead id="head"></thead><tbody id="rows"></tbody></table></div>
+  </section>
+</main>
+<div id="footer"></div>
+<script src="common.js"></script>
+<script>
+initCrud({
+  endpoint: '/api/customers', single: 'Customer',
+  fields: [
+    { name: 'name', label: 'Full Name', required: true, placeholder: 'e.g. Ravi Kumar' },
+    { name: 'phone', label: 'Phone', type: 'tel', required: true, placeholder: '9876543210', attrs: 'pattern="[0-9 +]{7,15}" title="Enter a valid phone number"' },
+    { name: 'email', label: 'Email', type: 'email', placeholder: 'name@example.com' },
+    { name: 'address', label: 'Address', type: 'textarea' }
+  ],
+  columns: [
+    { key: 'id', label: 'ID' }, { key: 'name', label: 'Name' }, { key: 'phone', label: 'Phone' },
+    { key: 'email', label: 'Email' }, { key: 'address', label: 'Address' }
+  ]
+});
+</script>
+</body>
+</html>
